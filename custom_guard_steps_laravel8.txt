@@ -1,0 +1,51 @@
+(1) composer create-project laravel/laravel custom_guard "8.*"
+(2) Create database
+(3) Change database connection in env file.
+(4) Create Admin Model file and do same copy paste of the User Model file.
+Add line in model file protected $guard = 'admin';
+
+(5) Open config /auth.php and define guards and providers for the admin.
+(6) Create  table same as user table for Admin via migration command and
+generate it.
+
+(7) Generate Auth ::
+=> Composer require laravel/ui
+=> php artisan ui:auth
+
+(8) If authenticated, then redirect instruction change to =>
+App/Http/Middleware/RedirectIfAuthenticated
+
+comment existing code and write below code.
+
+if($guard == "admin" && Auth::guard($guard)->check())
+{
+	return redirect("/admin");
+}
+if (Auth::guard($guard)->check()) 
+{
+	return redirect('/home');
+}
+
+(9) If user cannot logged in and want to access direct after logged in page
+need to change in  ::
+App\Http\Middleware\Authenticate
+
+replace this code to redirectTo
+
+
+protected function redirectTo($request)
+    {
+        if($request->is('admin'))
+        {
+            return route('admin.login');
+        }
+        else
+        {
+            if (! $request->expectsJson()) {
+                return route('login');
+            }
+        }
+    }
+
+=> prepare Auth/AdminLoginController < show login form, logout and authenticate user in this controller only>
+=> prepare Admin/AdminController  < use this controller after login>
